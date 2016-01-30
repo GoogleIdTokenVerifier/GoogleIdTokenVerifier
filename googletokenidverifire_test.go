@@ -1,13 +1,14 @@
-package googletokenidverifire
+package GoogleIdTokenVerifier
 
 import "testing"
 
 func TestCheckToken(t *testing.T) {
 	authToken := "XXXXXXXXXXX.XXXXXXXXXXXX.XXXXXXXXXX"
-	certs := getCerts(getCertsFromURL())
+	certs := GetCerts(GetCertsFromURL())
 	aud := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com"
-	actual := verifyGoogleIDToken(authToken, certs, aud)
-	expected := true
+	actual := VerifyGoogleIDToken(authToken, certs, aud)
+	var token *TokenInfo
+	expected := token
 	if actual != expected {
 		t.Errorf("got %v\nwant %v", actual, expected)
 	}

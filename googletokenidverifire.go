@@ -1,4 +1,4 @@
-package googletokenidverifire
+package GoogleIdTokenVerifier
 
 import (
 	"bytes"
@@ -32,8 +32,8 @@ type keys struct {
 	E   string `json:"e"`
 }
 
-// UserInfo is
-type tokenInfo struct {
+// TokenInfo is
+type TokenInfo struct {
 	Sub           string `json:"sub"`
 	Email         string `json:"email"`
 	AtHash        string `json:"at_hash"`
@@ -53,11 +53,12 @@ type tokenInfo struct {
 // https://developers.google.com/identity/sign-in/web/backend-auth
 // https://github.com/google/oauth2client/blob/master/oauth2client/crypt.py
 
-func verifyGoogleIDToken(authToken string, certs Certs, aud string) *tokenInfo {
+// VerifyGoogleIDToken is
+func VerifyGoogleIDToken(authToken string, certs *Certs, aud string) *TokenInfo {
 	header, payload, signature, messageToSign := divideAuthToken(authToken)
 
 	tokeninfo := getTokenInfo(payload)
-	var niltokeninfo *tokenInfo
+	var niltokeninfo *TokenInfo
 	//fmt.Println(tokeninfo)
 	if aud != tokeninfo.Aud {
 		err := errors.New("Token is not valid, Audience from token and certificate don't match")
@@ -89,27 +90,29 @@ func verifyGoogleIDToken(authToken string, certs Certs, aud string) *tokenInfo {
 	return tokeninfo
 }
 
-func getTokenInfo(bt []byte) *tokenInfo {
-	var a *tokenInfo
+func getTokenInfo(bt []byte) *TokenInfo {
+	var a *TokenInfo
 	json.Unmarshal(bt, &a)
 	return a
 }
 
-func checkTime(tokeninfo *tokenInfo) bool {
+func checkTime(tokeninfo *TokenInfo) bool {
 	if (time.Now().Unix() < tokeninfo.Iat) || (time.Now().Unix() > tokeninfo.Exp) {
 		return false
 	}
 	return true
 }
 
-func getCertsFromURL() []byte {
+//GetCertsFromURL is
+func GetCertsFromURL() []byte {
 	res, _ := http.Get("https://www.googleapis.com/oauth2/v3/certs")
 	certs, _ := ioutil.ReadAll(res.Body)
 	res.Body.Close()
 	return certs
 }
 
-func getCerts(bt []byte) *Certs {
+//GetCerts is
+func GetCerts(bt []byte) *Certs {
 	var certs *Certs
 	json.Unmarshal(bt, &certs)
 	return certs
