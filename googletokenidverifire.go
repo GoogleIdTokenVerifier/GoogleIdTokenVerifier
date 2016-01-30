@@ -83,13 +83,13 @@ func verifyGoogleIDToken(authToken string, certs Certs, aud string) bool {
 	return true
 }
 
-func getTokenInfo(bt []byte) tokenInfo {
-	var a tokenInfo
+func getTokenInfo(bt []byte) *tokenInfo {
+	var a *tokenInfo
 	json.Unmarshal(bt, &a)
 	return a
 }
 
-func checkTime(tokeninfo tokenInfo) bool {
+func checkTime(tokeninfo *tokenInfo) bool {
 	if (time.Now().Unix() < tokeninfo.Iat) || (time.Now().Unix() > tokeninfo.Exp) {
 		return false
 	}
@@ -103,8 +103,8 @@ func getCertsFromURL() []byte {
 	return certs
 }
 
-func getCerts(bt []byte) Certs {
-	var certs Certs
+func getCerts(bt []byte) *Certs {
+	var certs *Certs
 	json.Unmarshal(bt, &certs)
 	return certs
 }
