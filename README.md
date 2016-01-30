@@ -10,5 +10,5 @@ certs := getCerts(getCertsFromURL())
 
 aud := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com"
 
-fmt.Pringln(verifyGoogleIDToken(authToken, certs, aud))
+fmt.Println(verifyGoogleIDToken(authToken, certs, aud))
 ```
