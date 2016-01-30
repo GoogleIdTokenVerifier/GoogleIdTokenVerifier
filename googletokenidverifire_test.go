@@ -1,4 +1,4 @@
-package verifygoogletokenid
+package googletokenidverifire
 
 import "testing"
 
