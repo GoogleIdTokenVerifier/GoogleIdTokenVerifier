@@ -53,34 +53,40 @@ type tokenInfo struct {
 // https://developers.google.com/identity/sign-in/web/backend-auth
 // https://github.com/google/oauth2client/blob/master/oauth2client/crypt.py
 
-func verifyGoogleIDToken(authToken string, certs Certs, aud string) bool {
+func verifyGoogleIDToken(authToken string, certs Certs, aud string) *tokenInfo {
 	header, payload, signature, messageToSign := divideAuthToken(authToken)
 
 	tokeninfo := getTokenInfo(payload)
+	var niltokeninfo *tokenInfo
 	//fmt.Println(tokeninfo)
 	if aud != tokeninfo.Aud {
 		err := errors.New("Token is not valid, Audience from token and certificate don't match")
 		fmt.Printf("Error verifying key %s\n", err.Error())
-		return false
+		return niltokeninfo
+	}
+	if (tokeninfo.Iss != "accounts.google.com") && (tokeninfo.Iss != "https://accounts.google.com") {
+		err := errors.New("Token is not valid, ISS from token and certificate don't match")
+		fmt.Printf("Error verifying key %s\n", err.Error())
+		return niltokeninfo
 	}
 	if !checkTime(tokeninfo) {
 		err := errors.New("Token is not valid, Token is expired.")
 		fmt.Printf("Error verifying key %s\n", err.Error())
-		return false
+		return niltokeninfo
 	}
 
 	key, err := choiceKeyByKeyID(certs.Keys, getAuthTokenKeyID(header))
 	if err != nil {
 		fmt.Printf("Error verifying key %s\n", err.Error())
-		return false
+		return niltokeninfo
 	}
 	pKey := rsa.PublicKey{N: a5(urlsafeB64decode(key.N)), E: a4(a2(urlsafeB64decode(key.E)))}
 	err = rsa.VerifyPKCS1v15(&pKey, crypto.SHA256, messageToSign, signature)
 	if err != nil {
 		fmt.Printf("Error verifying key %s\n", err.Error())
-		return false
+		return niltokeninfo
 	}
-	return true
+	return tokeninfo
 }
 
 func getTokenInfo(bt []byte) *tokenInfo {
