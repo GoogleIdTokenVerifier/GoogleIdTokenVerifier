@@ -81,7 +81,7 @@ func VerifyGoogleIDToken(authToken string, certs *Certs, aud string) *TokenInfo 
 		fmt.Printf("Error verifying key %s\n", err.Error())
 		return niltokeninfo
 	}
-	pKey := rsa.PublicKey{N: a5(urlsafeB64decode(key.N)), E: a4(a2(urlsafeB64decode(key.E)))}
+	pKey := rsa.PublicKey{N: byteToInt(urlsafeB64decode(key.N)), E: btrToInt(byteToBtr(urlsafeB64decode(key.E)))}
 	err = rsa.VerifyPKCS1v15(&pKey, crypto.SHA256, messageToSign, signature)
 	if err != nil {
 		fmt.Printf("Error verifying key %s\n", err.Error())
@@ -141,40 +141,40 @@ func choiceKeyByKeyID(a []keys, tknkid string) (keys, error) {
 }
 
 func getAuthTokenKeyID(bt []byte) string {
-	var keys keys
-	json.Unmarshal(bt, &keys)
-	return keys.Kid
+	var a keys
+	json.Unmarshal(bt, &a)
+	return a.Kid
 }
 
 func divideAuthToken(str string) ([]byte, []byte, []byte, []byte) {
 	args := strings.Split(str, ".")
-	return urlsafeB64decode(args[0]), urlsafeB64decode(args[1]), urlsafeB64decode(args[2]), a3(args[0] + "." + args[1])
+	return urlsafeB64decode(args[0]), urlsafeB64decode(args[1]), urlsafeB64decode(args[2]), calcSum(args[0] + "." + args[1])
 }
 
-func a2(bt []byte) *bytes.Reader {
-	var bt2 []byte
-	if len(bt) < 8 {
-		bt2 = make([]byte, 8-len(bt), 8)
-		bt2 = append(bt2, bt...)
+func byteToBtr(bt0 []byte) *bytes.Reader {
+	var bt1 []byte
+	if len(bt0) < 8 {
+		bt1 = make([]byte, 8-len(bt0), 8)
+		bt1 = append(bt1, bt0...)
 	} else {
-		bt2 = bt
+		bt1 = bt0
 	}
-	return bytes.NewReader(bt2)
+	return bytes.NewReader(bt1)
 }
 
-func a3(str string) []byte {
+func calcSum(str string) []byte {
 	a := sha256.New()
 	a.Write([]byte(str))
 	return a.Sum(nil)
 }
 
-func a4(a io.Reader) int {
+func btrToInt(a io.Reader) int {
 	var e uint64
 	binary.Read(a, binary.BigEndian, &e)
 	return int(e)
 }
 
-func a5(bt []byte) *big.Int {
+func byteToInt(bt []byte) *big.Int {
 	a := big.NewInt(0)
 	a.SetBytes(bt)
 	return a
