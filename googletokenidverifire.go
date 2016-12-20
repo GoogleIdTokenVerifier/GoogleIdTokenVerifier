@@ -53,6 +53,11 @@ type TokenInfo struct {
 // https://developers.google.com/identity/sign-in/web/backend-auth
 // https://github.com/google/oauth2client/blob/master/oauth2client/crypt.py
 
+// Verify is
+func Verify(authToken string, aud string) *TokenInfo {
+	return VerifyGoogleIDToken(authToken, GetCerts(GetCertsFromURL()), aud)
+}
+
 // VerifyGoogleIDToken is
 func VerifyGoogleIDToken(authToken string, certs *Certs, aud string) *TokenInfo {
 	header, payload, signature, messageToSign := divideAuthToken(authToken)

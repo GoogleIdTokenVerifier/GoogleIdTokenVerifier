@@ -6,9 +6,7 @@ Usage:
 ```
 authToken := "XXXXXXXXXXX.XXXXXXXXXXXX.XXXXXXXXXX"
 
-certs := getCerts(getCertsFromURL())
-
 aud := "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com"
 
-fmt.Println(verifyGoogleIDToken(authToken, certs, aud))
+fmt.Println(Verify(authToken, aud))
 ```
